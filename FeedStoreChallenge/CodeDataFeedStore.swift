@@ -33,7 +33,7 @@ public class CoreDataFeedStore: FeedStore {
     
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         
-        Cache.saveCache(feed, timestamp: timestamp, into: context)
+        Cache.insert(feed, timestamp: timestamp, into: context)
         
         do {
             try context.save()
@@ -75,8 +75,7 @@ public class CoreDataFeedStore: FeedStore {
 }
 
 extension Cache {
-    // TODO: Check this name
-    static func saveCache(_ feed: [LocalFeedImage], timestamp: Date, into context: NSManagedObjectContext) {
+    static func insert(_ feed: [LocalFeedImage], timestamp: Date, into context: NSManagedObjectContext) {
         let cache: Cache = Cache.entity(into: context)
 
         cache.setValue(timestamp, forKey: #keyPath(Cache.timestamp))
