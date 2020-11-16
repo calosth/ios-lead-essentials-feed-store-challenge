@@ -35,12 +35,12 @@ public class CoreDataFeedStore: FeedStore {
         
         Cache.saveCache(feed, timestamp: timestamp, into: context)
         
-        if let _ = try? context.save() {
+        do {
+            try context.save()
             completion(nil)
-        } else {
-            completion(nil)
-        }
-        
+        } catch {
+            completion(error)
+        }        
     }
     
     public func retrieve(completion: @escaping RetrievalCompletion) {
