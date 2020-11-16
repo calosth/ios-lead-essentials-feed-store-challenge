@@ -32,6 +32,11 @@ public class CoreDataFeedStore: FeedStore {
     }
     
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+        let cacheModel: NSFetchRequest<Cache> = Cache.fetchRequest()
+        let cache = try? context.fetch(cacheModel)
+        if let insertedCache = cache {
+            insertedCache.forEach { context.delete($0) }
+        }
         
         Cache.insert(feed, timestamp: timestamp, into: context)
         
@@ -54,6 +59,10 @@ public class CoreDataFeedStore: FeedStore {
         } catch {
             completion(.failure(error))
         }
+    }
+    
+    private func deleteCache(in: NSManagedObjectContext) {
+        
     }
     
     private func fetchCache() throws -> (feed: [LocalFeedImage], timestamp: Date)? {
