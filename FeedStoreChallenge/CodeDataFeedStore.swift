@@ -78,27 +78,27 @@ extension Cache {
     static func insert(_ feed: [LocalFeedImage], timestamp: Date, into context: NSManagedObjectContext) {
         let cache: Cache = Cache.entity(into: context)
 
+        let feedImage = FeedImage.insert(feed, into: context)
+        
         cache.setValue(timestamp, forKey: #keyPath(Cache.timestamp))
-        let feedImages = NSMutableOrderedSet()
-        
-        feed.forEach { localFeedImage in
-            let feedImage = FeedImage.insert(localFeedImage, into: context)
-            feedImages.add(feedImage)
-        }
-        
-        cache.setValue(feedImages, forKey: #keyPath(Cache.feed))
+        cache.setValue(feedImage, forKey: #keyPath(Cache.feed))
     }
 }
 
 extension FeedImage {
-    static func insert(_ localFeed: LocalFeedImage, into context: NSManagedObjectContext) -> FeedImage {
-        let feedImage: FeedImage = FeedImage.entity(into: context)
+    static func insert(_ feed: [LocalFeedImage], into context: NSManagedObjectContext) -> NSOrderedSet {
         
-        feedImage.setValue(localFeed.id, forKey: "id")
-        feedImage.setValue(localFeed.description, forKey: #keyPath(FeedImage.information))
-        feedImage.setValue(localFeed.location, forKey: #keyPath(FeedImage.location))
-        feedImage.setValue(URL(string: localFeed.url.absoluteString), forKey: #keyPath(FeedImage.url))
+        let feedImages = NSMutableOrderedSet()
         
-        return feedImage
+        feed.forEach { localFeedImage in
+            let feedImage: FeedImage = FeedImage.entity(into: context)
+            feedImage.setValue(localFeedImage.id, forKey: "id")
+            feedImage.setValue(localFeedImage.description, forKey: #keyPath(FeedImage.information))
+            feedImage.setValue(localFeedImage.location, forKey: #keyPath(FeedImage.location))
+            feedImage.setValue(localFeedImage.url, forKey: #keyPath(FeedImage.url))
+            feedImages.add(feedImage)
+        }
+                
+        return feedImages
     }
 }
