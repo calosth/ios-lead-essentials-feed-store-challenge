@@ -40,11 +40,10 @@ public class CoreDataFeedStore: FeedStore {
             completion(nil)
         } catch {
             completion(error)
-        }        
+        }
     }
     
     public func retrieve(completion: @escaping RetrievalCompletion) {
-        let context = persistentContainer.viewContext
         let cache: NSFetchRequest<Cache> = Cache.fetchRequest()
         
         if let cache = try? context.fetch(cache) {
