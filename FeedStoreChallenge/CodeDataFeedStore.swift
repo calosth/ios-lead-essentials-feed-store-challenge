@@ -23,6 +23,8 @@ public class CoreDataFeedStore: FeedStore {
         return persistentContainer
     }()
     
+    lazy var context: NSManagedObjectContext = { persistentContainer.newBackgroundContext() }()
+    
     public init() { }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
@@ -30,7 +32,6 @@ public class CoreDataFeedStore: FeedStore {
     }
     
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-        let context = persistentContainer.viewContext
         
         Cache.saveCache(feed, timestamp: timestamp, into: context)
         
