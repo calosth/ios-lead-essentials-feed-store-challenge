@@ -32,20 +32,7 @@ public class CoreDataFeedStore: FeedStore {
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         let context = persistentContainer.viewContext
         
-        let cache = NSEntityDescription.insertNewObject(forEntityName: "Cache", into: context) as! Cache
-        cache.setValue(timestamp, forKey: #keyPath(Cache.timestamp))
-        
-        let images = NSMutableOrderedSet()
-        feed.forEach { localFeedImage in
-            let image = NSEntityDescription.insertNewObject(forEntityName: "FeedImage", into: context) as! FeedImage
-            image.setValue(localFeedImage.id, forKey: "id")
-            image.setValue(localFeedImage.description, forKey: #keyPath(FeedImage.information))
-            image.setValue(localFeedImage.location, forKey: #keyPath(FeedImage.location))
-            image.setValue(URL(string: localFeedImage.url.absoluteString), forKey: #keyPath(FeedImage.url))
-            images.add(image)
-        }
-        
-        cache.setValue(images, forKey: #keyPath(Cache.feed))
+        Cache.saveCache(feed, timestamp: timestamp, into: context)
         
         if let _ = try? context.save() {
             completion(nil)
@@ -72,5 +59,35 @@ public class CoreDataFeedStore: FeedStore {
         } else {
             completion(.empty)
         }
+    }
+}
+
+extension Cache {
+    // TODO: Check this name
+    static func saveCache(_ feed: [LocalFeedImage], timestamp: Date, into context: NSManagedObjectContext) {
+        let cache = NSEntityDescription.insertNewObject(forEntityName: "Cache", into: context) as! Cache
+        cache.setValue(timestamp, forKey: #keyPath(Cache.timestamp))
+        
+        let feedImages = NSMutableOrderedSet()
+        
+        feed.forEach { localFeedImage in
+            let feedImage = FeedImage.saveFeedImage(localFeedImage, into: context)
+            feedImages.add(feedImage)
+        }
+        
+        cache.setValue(feedImages, forKey: #keyPath(Cache.feed))
+    }
+}
+
+extension FeedImage {
+    static func saveFeedImage(_ localFeed: LocalFeedImage, into context: NSManagedObjectContext) -> FeedImage {
+        let feedImage = NSEntityDescription.insertNewObject(forEntityName: "FeedImage", into: context) as! FeedImage
+        
+        feedImage.setValue(localFeed.id, forKey: "id")
+        feedImage.setValue(localFeed.description, forKey: #keyPath(FeedImage.information))
+        feedImage.setValue(localFeed.location, forKey: #keyPath(FeedImage.location))
+        feedImage.setValue(URL(string: localFeed.url.absoluteString), forKey: #keyPath(FeedImage.url))
+        
+        return feedImage
     }
 }
