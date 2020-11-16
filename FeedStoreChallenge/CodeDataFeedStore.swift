@@ -11,10 +11,11 @@ import CoreData
 public class CoreDataFeedStore: FeedStore {
     
     lazy var persistentContainer: NSPersistentContainer = {
-        let modelURL = Bundle(for: type(of: self)).url(forResource: "FeedCacheModel", withExtension: "momd")!
+        let modelName = "FeedCacheModel"
+        let modelURL = Bundle(for: type(of: self)).url(forResource: modelName, withExtension: "momd")!
         let mom = NSManagedObjectModel(contentsOf: modelURL)!
         
-        let persistentContainer = NSPersistentContainer(name: "FeedCacheModel", managedObjectModel: mom)
+        let persistentContainer = NSPersistentContainer(name: modelName, managedObjectModel: mom)
         let description = NSPersistentStoreDescription()
         description.url = URL(fileURLWithPath: "/dev/null")
         persistentContainer.persistentStoreDescriptions = [description]
