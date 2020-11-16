@@ -73,32 +73,3 @@ public class CoreDataFeedStore: FeedStore {
         }
     }
 }
-
-extension Cache {
-    static func insert(_ feed: [LocalFeedImage], timestamp: Date, into context: NSManagedObjectContext) {
-        let cache: Cache = Cache.entity(into: context)
-
-        let feedImage = FeedImage.insert(feed, into: context)
-        
-        cache.setValue(timestamp, forKey: #keyPath(Cache.timestamp))
-        cache.setValue(feedImage, forKey: #keyPath(Cache.feed))
-    }
-}
-
-extension FeedImage {
-    static func insert(_ feed: [LocalFeedImage], into context: NSManagedObjectContext) -> NSOrderedSet {
-        
-        let feedImages = NSMutableOrderedSet()
-        
-        feed.forEach { localFeedImage in
-            let feedImage: FeedImage = FeedImage.entity(into: context)
-            feedImage.setValue(localFeedImage.id, forKey: "id")
-            feedImage.setValue(localFeedImage.description, forKey: #keyPath(FeedImage.information))
-            feedImage.setValue(localFeedImage.location, forKey: #keyPath(FeedImage.location))
-            feedImage.setValue(localFeedImage.url, forKey: #keyPath(FeedImage.url))
-            feedImages.add(feedImage)
-        }
-                
-        return feedImages
-    }
-}
