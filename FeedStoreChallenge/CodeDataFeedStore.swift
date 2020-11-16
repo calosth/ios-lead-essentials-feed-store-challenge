@@ -44,27 +44,38 @@ public class CoreDataFeedStore: FeedStore {
     }
     
     public func retrieve(completion: @escaping RetrievalCompletion) {
-        let cache: NSFetchRequest<Cache> = Cache.fetchRequest()
         
         do {
-            let cache = try context.fetch(cache)
-        
-            if let founded = cache.first {
-                let feedMapped = (founded.feed?.array as! [FeedImage]).map {
-                    LocalFeedImage(id: $0.id!, description: $0.information, location: $0.location, url: $0.url!.absoluteURL)
-                }
-                completion(.found(feed: feedMapped, timestamp: founded.timestamp!))
+            if let cache = try fetchCache() {
+                completion(.found(feed: cache.feed, timestamp: cache.timestamp))
             } else {
-                completion(.empty) 
+                completion(.empty)
             }
         } catch {
             completion(.failure(error))
         }
     }
+    
+    private func fetchCache() throws -> (feed: [LocalFeedImage], timestamp: Date)? {
+        let cacheModel: NSFetchRequest<Cache> = Cache.fetchRequest()
+        let cache = try context.fetch(cacheModel)
+        
+        guard let feed = cache.first?.feed?.array as? [FeedImage], let timestamp = cache.first?.timestamp else {
+            return nil
+        }
+        
+        return (map(feed), timestamp)
+    }
+    
+    private func map(_ feedImage: [FeedImage]) -> [LocalFeedImage] {
+        return feedImage.map {
+            LocalFeedImage(id: $0.id!, description: $0.information, location: $0.location, url: $0.url!.absoluteURL)
+        }
+    }
 }
 
 extension Cache {
-    // TODO: Check this name
+    // TODO: Check this name    
     static func saveCache(_ feed: [LocalFeedImage], timestamp: Date, into context: NSManagedObjectContext) {
         let cache = NSEntityDescription.insertNewObject(forEntityName: "Cache", into: context) as! Cache
         cache.setValue(timestamp, forKey: #keyPath(Cache.timestamp))
