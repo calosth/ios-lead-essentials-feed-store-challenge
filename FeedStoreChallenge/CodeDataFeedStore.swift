@@ -46,7 +46,8 @@ public class CoreDataFeedStore: FeedStore {
     public func retrieve(completion: @escaping RetrievalCompletion) {
         let cache: NSFetchRequest<Cache> = Cache.fetchRequest()
         
-        if let cache = try? context.fetch(cache) {
+        do {
+            let cache = try context.fetch(cache)
         
             if let founded = cache.first {
                 let feedMapped = (founded.feed?.array as! [FeedImage]).map {
@@ -56,8 +57,8 @@ public class CoreDataFeedStore: FeedStore {
             } else {
                 completion(.empty) 
             }
-        } else {
-            completion(.empty)
+        } catch {
+            completion(.failure(error))
         }
     }
 }
