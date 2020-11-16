@@ -69,7 +69,7 @@ public class CoreDataFeedStore: FeedStore {
     
     private func map(_ feedImage: [FeedImage]) -> [LocalFeedImage] {
         return feedImage.map {
-            LocalFeedImage(id: $0.id!, description: $0.information, location: $0.location, url: $0.url!.absoluteURL)
+            LocalFeedImage(id: $0.id!, description: $0.information, location: $0.location, url: $0.url!)
         }
     }
 }
