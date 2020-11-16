@@ -75,15 +75,15 @@ public class CoreDataFeedStore: FeedStore {
 }
 
 extension Cache {
-    // TODO: Check this name    
+    // TODO: Check this name
     static func saveCache(_ feed: [LocalFeedImage], timestamp: Date, into context: NSManagedObjectContext) {
-        let cache = NSEntityDescription.insertNewObject(forEntityName: "Cache", into: context) as! Cache
+        let cache: Cache = Cache.entity(into: context)
+
         cache.setValue(timestamp, forKey: #keyPath(Cache.timestamp))
-        
         let feedImages = NSMutableOrderedSet()
         
         feed.forEach { localFeedImage in
-            let feedImage = FeedImage.saveFeedImage(localFeedImage, into: context)
+            let feedImage = FeedImage.insert(localFeedImage, into: context)
             feedImages.add(feedImage)
         }
         
@@ -92,8 +92,8 @@ extension Cache {
 }
 
 extension FeedImage {
-    static func saveFeedImage(_ localFeed: LocalFeedImage, into context: NSManagedObjectContext) -> FeedImage {
-        let feedImage = NSEntityDescription.insertNewObject(forEntityName: "FeedImage", into: context) as! FeedImage
+    static func insert(_ localFeed: LocalFeedImage, into context: NSManagedObjectContext) -> FeedImage {
+        let feedImage: FeedImage = FeedImage.entity(into: context)
         
         feedImage.setValue(localFeed.id, forKey: "id")
         feedImage.setValue(localFeed.description, forKey: #keyPath(FeedImage.information))
