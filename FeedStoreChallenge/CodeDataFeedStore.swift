@@ -28,6 +28,7 @@ public class CoreDataFeedStore: FeedStore {
     public init() { }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+        deleteCache(in: context)
         completion(nil)
     }
     
