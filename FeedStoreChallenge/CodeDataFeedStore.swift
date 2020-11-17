@@ -8,7 +8,13 @@
 
 import CoreData
 
+public enum StoreType {
+    case persistent, inMemory
+}
+
 public class CoreDataFeedStore: FeedStore {
+    
+    private let storeType: StoreType
     
     lazy var persistentContainer: NSPersistentContainer = {
         let modelName = "FeedCacheModel"
@@ -16,16 +22,20 @@ public class CoreDataFeedStore: FeedStore {
         let mom = NSManagedObjectModel(contentsOf: modelURL)!
         
         let persistentContainer = NSPersistentContainer(name: modelName, managedObjectModel: mom)
-        let description = NSPersistentStoreDescription()
-        description.url = URL(fileURLWithPath: "/dev/null")
-        persistentContainer.persistentStoreDescriptions = [description]
+        if storeType == .inMemory {
+            let description = NSPersistentStoreDescription()
+            description.url = URL(fileURLWithPath: "/dev/null")
+            persistentContainer.persistentStoreDescriptions = [description]
+        }
         persistentContainer.loadPersistentStores { description, error in }
         return persistentContainer
     }()
     
     lazy var context: NSManagedObjectContext = { persistentContainer.newBackgroundContext() }()
     
-    public init() { }
+    public init(storeType: StoreType = .persistent) {
+        self.storeType = storeType
+    }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
         
