@@ -14,14 +14,21 @@ public enum StoreType {
 
 public class CoreDataFeedStore: FeedStore {
         
+    enum CoreDataFeedStore: Error {
+        case modelNotFound
+    }
     private var persistentContainer: NSPersistentContainer
     
     private lazy var context: NSManagedObjectContext = { persistentContainer.newBackgroundContext() }()
     
-    public init(storeURL: URL? = nil) {
+    public init(storeURL: URL = NSPersistentContainer.defaultDirectoryURL()) throws {
         let modelName = "FeedCacheModel"
-        let modelURL = Bundle(for: type(of: self)).url(forResource: modelName, withExtension: "momd")!
-        let mom = NSManagedObjectModel(contentsOf: modelURL)!
+        let modelextension = "momd"
+        guard
+            let modelURL = Bundle(for: type(of: self)).url(forResource: modelName, withExtension: modelextension),
+            let mom = NSManagedObjectModel(contentsOf: modelURL) else {
+            throw CoreDataFeedStore.modelNotFound
+        }
         
         persistentContainer = NSPersistentContainer(name: modelName, managedObjectModel: mom)
 
