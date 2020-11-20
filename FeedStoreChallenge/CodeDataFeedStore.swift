@@ -21,7 +21,7 @@ public class CoreDataFeedStore: FeedStore {
     
     private lazy var context: NSManagedObjectContext = { persistentContainer.newBackgroundContext() }()
     
-    public init(storeURL: URL = NSPersistentContainer.defaultDirectoryURL()) throws {
+    public init(storeURL: URL? = nil) throws {
         let modelName = "FeedCacheModel"
         let modelextension = "momd"
         guard
@@ -32,9 +32,11 @@ public class CoreDataFeedStore: FeedStore {
         
         persistentContainer = NSPersistentContainer(name: modelName, managedObjectModel: mom)
 
-        let description = NSPersistentStoreDescription()
-        description.url = storeURL
-        persistentContainer.persistentStoreDescriptions = [description]
+        if let url = storeURL {
+            let description = NSPersistentStoreDescription()
+            description.url = url
+            persistentContainer.persistentStoreDescriptions = [description]
+        }
         persistentContainer.loadPersistentStores { _, _ in }
     }
     
