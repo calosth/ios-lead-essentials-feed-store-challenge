@@ -44,6 +44,7 @@ public class CoreDataFeedStore: FeedStore {
         
         do {
             try deleteCache(in: context)
+            try context.save()
             completion(nil)
         } catch {
             completion(error)
