@@ -8,6 +8,15 @@
 
 import CoreData
 
+
+@objc(FeedImage)
+class FeedImage: NSManagedObject {
+    @NSManaged var id: UUID
+    @NSManaged var information: String?
+    @NSManaged var location: String?
+    @NSManaged var url: URL
+}
+
 extension FeedImage {
     static func insert(_ feed: [LocalFeedImage], into context: NSManagedObjectContext) -> NSOrderedSet {
         let feedImages = NSMutableOrderedSet()

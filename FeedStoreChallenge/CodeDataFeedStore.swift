@@ -89,7 +89,7 @@ public class CoreDataFeedStore: FeedStore {
         let cacheModel: NSFetchRequest<Cache> = Cache.fetchRequest()
         let cache = try context.fetch(cacheModel)
         
-        guard let feed = cache.first?.feed?.array as? [FeedImage], let timestamp = cache.first?.timestamp else {
+        guard let feed = cache.first?.feed.array as? [FeedImage], let timestamp = cache.first?.timestamp else {
             return nil
         }
         
@@ -98,7 +98,7 @@ public class CoreDataFeedStore: FeedStore {
     
     private func map(_ feedImage: [FeedImage]) -> [LocalFeedImage] {
         return feedImage.map {
-            LocalFeedImage(id: $0.id!, description: $0.information, location: $0.location, url: $0.url!)
+            LocalFeedImage(id: $0.id, description: $0.information, location: $0.location, url: $0.url)
         }
     }
 }

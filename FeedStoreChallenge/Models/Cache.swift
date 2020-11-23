@@ -8,6 +8,12 @@
 
 import CoreData
 
+@objc(Cache)
+class Cache: NSManagedObject {
+    @NSManaged var timestamp: Date
+    @NSManaged var feed: NSOrderedSet
+}
+
 extension Cache {
     static func insert(_ feed: [LocalFeedImage], timestamp: Date, into context: NSManagedObjectContext) {
         let cache: Cache = Cache.entity(into: context)

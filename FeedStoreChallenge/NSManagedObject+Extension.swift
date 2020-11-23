@@ -9,6 +9,10 @@
 import CoreData
 
 extension NSManagedObject {
+    static func fetchRequest<T>() -> NSFetchRequest<T> {
+        NSFetchRequest(entityName:  NSStringFromClass(T.self))
+    }
+    
     static func entity<T: NSManagedObject>(into context: NSManagedObjectContext) -> T {
         NSEntityDescription.insertNewObject(forEntityName: NSStringFromClass(T.self), into: context) as! T
     }
