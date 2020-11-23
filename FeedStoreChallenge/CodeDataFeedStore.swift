@@ -8,20 +8,18 @@
 
 import CoreData
 
-public enum StoreType {
-    case persistent, inMemory
-}
-
 public class CoreDataFeedStore: FeedStore {
         
     enum CoreDataFeedStore: Error {
         case modelNotFound
+        case failedToLoadPersistentStore(Error)
     }
-    private var persistentContainer: NSPersistentContainer
+    
+    private let persistentContainer: NSPersistentContainer
     
     private lazy var context: NSManagedObjectContext = { persistentContainer.newBackgroundContext() }()
     
-    public init(storeURL: URL? = nil) throws {
+    public init(storeURL: URL) throws {
         let modelName = "FeedCacheModel"
         let modelextension = "momd"
         guard
@@ -31,13 +29,18 @@ public class CoreDataFeedStore: FeedStore {
         }
         
         persistentContainer = NSPersistentContainer(name: modelName, managedObjectModel: mom)
-
-        if let url = storeURL {
-            let description = NSPersistentStoreDescription()
-            description.url = url
-            persistentContainer.persistentStoreDescriptions = [description]
+        
+        persistentContainer.persistentStoreDescriptions = [NSPersistentStoreDescription(url: storeURL)]
+        
+        var loadError: Error?
+        persistentContainer.loadPersistentStores { _, receivedError in
+            loadError = receivedError
         }
-        persistentContainer.loadPersistentStores { _, _ in }
+        
+        if let error = loadError {
+            throw CoreDataFeedStore.failedToLoadPersistentStore(error)
+        }
+        
     }
     
     public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
